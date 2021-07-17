@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class GameManager : MonoBehaviour
 {
@@ -16,8 +19,6 @@ public class GameManager : MonoBehaviour
 
     private bool m_Started = false;
     private int m_Points;
-
-    //private int topScore;
 
     private bool m_GameOver = false;
 
@@ -42,9 +43,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     private void Update()
     {
-        //topScoreText.text = "top score: " + MainManager.Instance.playerNameString + " : " + ScoreText.text;
 
         if (!m_Started)
         {
@@ -66,6 +67,23 @@ public class GameManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Exit();
+        }
+    }
+
+    private void Exit()
+    {        
+        MainManager.Instance.SaveUserData();
+
+#if UNITY_EDITOR
+        EditorApplication.ExitPlaymode();
+#else
+        Application.Quit();
+#endif
+
     }
 
     void AddPoint(int point)
@@ -82,11 +100,12 @@ public class GameManager : MonoBehaviour
         if (m_Points > MainManager.Instance.topScore)
         {
             MainManager.Instance.topScore = m_Points;
+            MainManager.Instance.topScorerNameString = MainManager.Instance.playerNameString;
             topScoreText.text = "Top Scorer " + MainManager.Instance.playerNameString + " : " + m_Points;
         }
         else if (m_Points < MainManager.Instance.topScore)
         {
-            topScoreText.text = "Top Scorer " + MainManager.Instance.playerNameString + " : " + MainManager.Instance.topScore;
+            topScoreText.text = "Top Scorer " + MainManager.Instance.topScorerNameString + " : " + MainManager.Instance.topScore;
         }
     }
 }
